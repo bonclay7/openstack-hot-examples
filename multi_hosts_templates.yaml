@@ -1,0 +1,52 @@
+heat_template_version: 2013-05-23
+description: >
+    multiple servers sharing the same properties (key-pair netid image-type). Fixed flavor to m1.tiny
+parameters:
+  InstancesCount:
+    type: number
+    label: Instances Count
+    description: number of instances you want to deploy
+    default: 2
+  ImageID:
+    type: string
+    label: Image ID
+    description: Image used to boot servers
+    default: cirros-0.3.3-x86_64
+  NetID:
+    type: string
+    label: Network ID
+    description: sub-network ID for the servers
+  KeyName:
+    type: string
+    label: Key Pair Name
+    description: server ssh key-pair
+  InstanceType:
+    type: string
+    label: Instance Type
+    description: Type of instance (flavor) to be used
+    default: m1.tiny
+    constraints:
+      - allowed_values: 
+        - m1.tiny
+        - m1.small
+        description: Value must be one of m1.tiny or m1.small
+
+resources: 
+  ServerGroup:
+    type: OS::Heat::InstanceGroup
+    properties: 
+      LaunchConfigurationName: { get_resource: ServerConfig }
+      AvailabilityZones: []
+      Size: { get_param: InstancesCount }
+  ServerConfig:
+    type: OS::Nova::Server
+    properties:
+      flavor: { get_param: InstanceType }
+      key_name: { get_param: KeyName }
+      image: { get_param: ImageID }
+      networks:
+        - network: { get_param: NetID }
+
+outputs:
+  server_group_addresses:
+    value: { get_attr: [ServerGroup, InstanceList] }

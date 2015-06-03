@@ -1,0 +1,92 @@
+heat_template_version: 2013-05-23
+
+description: Two servers with server 2 pinging server one during it's first boot
+
+parameters:
+  image:
+    type: string
+    label: Image name or ID
+    description: Image to be used for compute instance
+    default: cirros-0.3.3-x86_64
+  flavor:
+    type: string
+    label: Flavor
+    description: Type of instance (flavor) to be used
+    default: m1.tiny
+  key:
+    type: string
+    label: Key name
+    description: Name of key-pair to be used for compute instance
+    default: demo-key
+  private_network:
+    type: string
+    label: Private network name or ID
+    description: Network to attach instance to.
+    default: demo-net
+
+resources:   
+  server1:
+    type: OS::Nova::Server
+    properties:
+      name: server1
+      flavor: { get_param: InstanceType }
+      key_name: { get_param: KeyName }
+      image: { get_param: ImageID }
+      networks:
+        - network: { get_param: NetID }
+      user_data: 
+        str_replace:
+          template: |
+            #!/bin/bash
+            curl -X PUT -H 'Content-Type:application/json' \
+              -d '{"status" : "SUCCESS","Reason" : "Server1 started","ip" : "%ip_address%"}' \
+              "$wait_handle$"
+          params:
+            "%ip_address%":
+              get_attr: [server1, first_address]
+            "%wait_handle%":
+              get_resource: server1_wait_handle
+      user_data_format: RAW
+
+  server1_wait: 
+    type: OS::Heat::WaitCondition   
+    properties: 
+      handle: 
+        get_resource: server1_wait_handle
+      timeout: 2000
+
+  server1_wait_handle: 
+    type: OS::Heat::WaitConditionHandle
+
+  server2:
+    type: OS::Nova::Server
+    properties:
+      name: server2
+      flavor: { get_param: InstanceType }
+      key_name: { get_param: KeyName }
+      image: { get_param: ImageID }
+      networks:
+        - network: { get_param: NetID }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash
+            ping -c 10 %ip_address%
+          params:
+            "%ip_address%":
+              get_attr: [server1, first_address]
+      user_data_format: RAW
+
+outputs:
+  server1_name:
+    description: Name of the instance 1
+    value: { get_attr: [server1, name] }
+  server1_ip:
+    description: IP address of the instance
+    value: { get_attr: [server1, first_address] }
+  server2_name:
+    description: Name of the instance 2
+    value: { get_attr: [server2, name] }
+  server2_ip:
+    description: IP address of the instance
+    value: { get_attr: [server2, first_address] }
