@@ -28,10 +28,10 @@ parameters:
     label: Floating IP ID
     description: Floating ip adress. $ neutron floatingip-list
     default: 59f5c4b4-91a7-4c9c-bdf9-18541ca1a8a6
-  root_password:
+  ec2-user_password:
     type: string
     label: Modified root password
-    default: popito
+    default: popito225
 
 resources:  
   puppetmaster_instance:
@@ -46,16 +46,19 @@ resources:
           template: |
             #!/bin/bash -v
 
-            echo root:'$ROOT_PASSWORD' | /usr/sbin/chpasswd            
-            ping -c 20 192.168.17.1            
+            echo ec2-user:'$USER_PASSWORD' | /usr/sbin/chpasswd    
+            sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/"   /etc/ssh/sshd_config
+            service ssh restart
+            sleep 20
+            ping -c 20 192.168.17.1
             apt-get -y update
           params:
-            "$ROOT_PASSWORD": { get_param: root_password }            
+            "$USER_PASSWORD": { get_param: ec2-user_password }            
   association:
-     type: OS::Nova::FloatingIPAssociation
+     type: OS::Neutron::FloatingIPAssociation
      properties:
-       floating_ip: { get_param: floating_ip_id }
-       server_id: { get_resource: puppetmaster_instance }
+       floatingip_id: { get_param: floating_ip_id }
+       port_id: {get_attr: [puppetmaster_instance, addresses, {get_param: private_network}, 0, port]}
 
 outputs:
   instance_name:
