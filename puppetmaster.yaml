@@ -1,6 +1,6 @@
 heat_template_version: 2013-05-23
 
-description: Simple template to deploy a puppet master connected to the internet
+description: This template orchestrate an instance running a puppetmaster server properly configured.
 
 parameters:
   image:
@@ -17,7 +17,7 @@ parameters:
     type: string
     label: Key name
     description: Name of key-pair to be used for compute instance
-    default: demo-key
+    default: heat-instances-key
   private_network:
     type: string
     label: Private network name or ID
@@ -32,28 +32,88 @@ parameters:
     type: string
     label: Modified root password
     default: popito225
+    hidden: true
+  instance_name:
+    type: string
+    label: Instance name
+    default: puppetmaster
 
 resources:  
+
+  puppetmaster_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 192.168.17.1/24
+          port_range_min: 8140
+          port_range_max: 8140
+
+  private_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: private_network }
+      security_groups:
+        - default
+        - { get_resource: puppetmaster_secgroup }
+
   puppetmaster_instance:
     type: OS::Nova::Server
     properties:
       image: { get_param: image }
       flavor: { get_param: flavor }
+      name: { get_param: instance_name }
+      key_name: { get_param: key_name }
       networks:
-        - network: { get_param: private_network }
+        - port: { get_resource: private_port }
       user_data:
         str_replace:
           template: |
             #!/bin/bash -v
 
+            ## Changing root password (not really useful, but just to show it's possible)
             echo ec2-user:'$USER_PASSWORD' | /usr/sbin/chpasswd    
-            sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/"   /etc/ssh/sshd_config
-            service ssh restart
-            sleep 20
-            ping -c 20 192.168.17.1
+
+            ## prevent ssh connection
+            service ssh stop
+
+            ## hostname in /etc/hosts
+            ## we use bash to avoid heat circular dependencies if we tried to get the ip address with get_attr instead
+            ## we would have done this into the current template : { get_attr: [puppetmaster_instance, first_address] }
+            echo "$(ifconfig eth0|awk -F':' '/inet addr/ {print $2}'|awk '{print $1}') $INSTANCE_NAME" >> /etc/hosts
+
+            ## Prepare puppet
+            curl -O https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
+            dpkg -i puppetlabs-release-trusty.deb
+            export LC_ALL=en_US.UTF-8
+
+            ## Refresh apt cache
             apt-get -y update
+
+            #Install packages
+            apt-get -y install ntp puppet puppetmaster-passenger
+
+            # configure puppet.conf file
+            echo "dns_alt_names = $INSTANCE_NAME,$INSTANCE_NAME.demo.opensteak.fr" >> /etc/puppet/puppet.conf
+            echo 'environmentpath = $confdir/environments' >> /etc/puppet/puppet.conf
+            echo 'basemodulepath = $confdir/modules' >> /etc/puppet/puppet.conf
+
+            ## create puppet work environments
+            mkdir -p /etc/puppet/environments/production/{modules,manifests}
+
+
+            ## create environment config file
+            echo 'modulepath = /etc/puppet/environments/production/modules' >> /etc/puppet/environments/production/environment.conf
+            echo 'environment_timeout = 5s' >> /etc/puppet/environments/production/environment.conf
+            
+
+            # restarting puppet and turning on ssh service after configuration is done
+            service apache2 restart
+            service ssh start            
           params:
-            "$USER_PASSWORD": { get_param: ec2-user_password }            
+            "$USER_PASSWORD": { get_param: ec2-user_password }
+            "$INSTANCE_NAME": { get_param: instance_name }              
+  
   association:
      type: OS::Neutron::FloatingIPAssociation
      properties:
