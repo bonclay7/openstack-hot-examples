@@ -1,0 +1,54 @@
+heat_template_version: 2013-05-23
+description: AutoScaling Mediawiki connected to puppetmaster
+parameters:
+  image:
+    type: string    
+    description: Image to be used for compute instance    
+  flavor:
+    type: string    
+    description: Type of instance (flavor) to be used    
+  key_name:
+    type: string    
+    description: Name of key-pair to be used for compute instance
+  user_data:
+    type: string
+    description: Server user_data
+  metadata:
+    type: json
+  private_network:
+    type: string
+    description: Network to attach instance to.
+  pool_id:
+    type: string
+    description: Pool to contact
+  ec2-user_password:
+    type: string    
+    hidden: true
+
+resources:
+  wiki_instance:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: image }
+      flavor: { get_param: flavor }      
+      key_name: { get_param: key_name }
+      metadata: {get_param: metadata}
+      user_data: {get_param: user_data}
+      user_data_format: RAW
+      networks:
+        - port: { get_param: private_network }      
+
+  member:
+    type: OS::Neutron::PoolMember
+    properties:
+      pool_id: {get_param: pool_id}
+      address: {get_attr: [wiki_instance, first_address]}
+      protocol_port: 80
+
+outputs:
+  server_ip:
+    description: IP Address of the load-balanced server.
+    value: { get_attr: [wiki_instance, first_address] }
+  lb_member:
+    description: LB member details.
+    value: { get_attr: [member, show] }
