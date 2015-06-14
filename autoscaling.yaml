@@ -32,7 +32,7 @@ parameters:
     default: popito225
     hidden: true
 
-resources:
+resources:  
   wiki_secgroup:
     type: OS::Neutron::SecurityGroup
     properties:
@@ -41,15 +41,6 @@ resources:
           remote_ip_prefix: 0.0.0.0/0
           port_range_min: 80
           port_range_max: 80
-
-  private_port:
-    type: OS::Neutron::Port
-    properties:
-      network: { get_param: private_network }
-      security_groups:
-        - default
-        - { get_resource: wiki_secgroup }
-
   asg:
     type: OS::Heat::AutoScalingGroup
     properties:
@@ -61,23 +52,11 @@ resources:
           flavor: {get_param: flavor}
           image: {get_param: image}
           key_name: {get_param: key_name}
-          private_network: {get_resource: private_port}
+          private_network: { get_param: private_network }
           pool_id: {get_resource: pool}      
           ec2-user_password: {get_param: ec2-user_password}    
+          wiki_secgroup: { get_resource: wiki_secgroup }
           metadata: {"metering.stack": {get_param: "OS::stack_id"}}
-          user_data:
-            str_replace:
-              template: |
-                #!/bin/bash -v
-
-                ## Changing root password (not really useful, but just to show it's possible)
-                echo ec2-user:'$USER_PASSWORD' | sudo /usr/sbin/chpasswd    
-                echo 'LC_ALL=en_US.UTF-8' >> /etc/environment
-                apt-get moo
-                ping -c 4 8.8.8.8
-              params:
-                "$USER_PASSWORD": { get_param: ec2-user_password }
-
   wiki_scaleup_policy:
     type: OS::Heat::ScalingPolicy
     properties:
@@ -169,7 +148,7 @@ outputs:
       str_replace:
         template: http://host/mediawiki/
         params:
-          host: {get_attr: [pool, vip, address]}
+          host: association
     description: >
       This URL is the "external" URL that can be used to access the
       Wordpress site.

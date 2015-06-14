@@ -10,14 +10,14 @@ parameters:
   key_name:
     type: string    
     description: Name of key-pair to be used for compute instance
-  user_data:
-    type: string
-    description: Server user_data
   metadata:
     type: json
   private_network:
     type: string
     description: Network to attach instance to.
+  wiki_secgroup:
+    type: string
+    description: wiki security group
   pool_id:
     type: string
     description: Pool to contact
@@ -26,17 +26,56 @@ parameters:
     hidden: true
 
 resources:
+  instance_name:
+    type: OS::Heat::RandomString
+    properties:
+      length: 10
+  private_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: private_network }
+      security_groups:
+        - default
+        - { get_param: wiki_secgroup }
+
   wiki_instance:
     type: OS::Nova::Server
     properties:
+      admin_pass: popito225
       image: { get_param: image }
       flavor: { get_param: flavor }      
       key_name: { get_param: key_name }
+      name:
+        str_replace:
+          template: |
+            wiki-pool-suffix
+          params: 
+            suffix: { get_resource: instance_name}
       metadata: {get_param: metadata}
-      user_data: {get_param: user_data}
-      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -v
+
+            id
+
+            ## hostname in /etc/hosts
+            ## we use bash to avoid heat circular dependencies if we tried to get the ip address with get_attr instead
+            ## we would have done this into the current template : { get_attr: [puppetmaster_instance, first_address] }                
+            echo "$(ifconfig eth0|awk -F':' '/inet addr/ {print $2}'|awk '{print $1}') wiki-pool-$INSTANCE_NAME" >> /etc/hosts
+
+            ## Changing root password (not really useful, but just to show it's possible)
+            echo ec2-user:'$USER_PASSWORD' | /usr/sbin/chpasswd    
+            echo 'LC_ALL=en_US.UTF-8' >> /etc/environment
+            apt-get moo
+            ping -c 4 8.8.8.8
+            #cpu overload
+            dd if=/dev/zero of=/dev/null &
+          params:
+            "$USER_PASSWORD": { get_param: ec2-user_password }
+            "$INSTANCE_NAME": { get_resource: instance_name }
       networks:
-        - port: { get_param: private_network }      
+        - port: { get_resource : private_port }      
 
   member:
     type: OS::Neutron::PoolMember
