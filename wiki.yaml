@@ -57,8 +57,6 @@ resources:
           template: |
             #!/bin/bash -v
 
-            id
-
             ## hostname in /etc/hosts
             ## we use bash to avoid heat circular dependencies if we tried to get the ip address with get_attr instead
             ## we would have done this into the current template : { get_attr: [puppetmaster_instance, first_address] }                
@@ -68,9 +66,23 @@ resources:
             echo ec2-user:'$USER_PASSWORD' | /usr/sbin/chpasswd    
             echo 'LC_ALL=en_US.UTF-8' >> /etc/environment
             apt-get moo
-            ping -c 4 8.8.8.8
-            #cpu overload
-            dd if=/dev/zero of=/dev/null &
+            
+            # cpu overload
+            # dd if=/dev/zero of=/dev/null &
+
+            #Prepare puppet
+            #curl -O https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
+            #dpkg -i puppetlabs-release-trusty.deb
+
+            ## Refresh apt cache
+            #apt-get -y update
+            #apt-get -y install puppet git
+
+            #echo 'server = puppetmaster' >> /etc/puppet/puppet.conf
+            #puppet agent --enable
+            #puppet agent --verbose --no-daemonize --onetime
+
+            ## TODO : connect to puppetmaster to retrieve wiki running configuration
           params:
             "$USER_PASSWORD": { get_param: ec2-user_password }
             "$INSTANCE_NAME": { get_resource: instance_name }
