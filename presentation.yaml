@@ -45,7 +45,7 @@ resources:
     properties:
       length: 10
 
-  puppetmaster_secgroup:
+  pres_secgroup:
     type: OS::Neutron::SecurityGroup
     properties:
       rules:
@@ -53,14 +53,23 @@ resources:
           remote_ip_prefix: 192.168.17.1/24
           port_range_min: 8140
           port_range_max: 8140
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 80
+          port_range_max: 80
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 22
+          port_range_max: 22
+
 
   private_port:
     type: OS::Neutron::Port
     properties:
       network: { get_param: private_network }
       security_groups:
-        - default
-        - { get_resource: puppetmaster_secgroup }
+        - default        
+        - { get_resource: pres_secgroup }
 
   presentation_instance:
     type: OS::Nova::Server
@@ -84,7 +93,7 @@ resources:
             ## we use bash to avoid heat circular dependencies if we tried to get the ip address with get_attr instead
             ## we would have done this into the current template : { get_attr: [presentation_instance, first_address] }
             echo "$(ifconfig eth0|awk -F':' '/inet addr/ {print $2}'|awk '{print $1}') $INSTANCE_NAME" >> /etc/hosts
-            echo '192.168.17.56 puppetmaster' >> /etc/hosts
+            echo '192.168.17.56 puppetmaster.openstacklocal' >> /etc/hosts
 
             ## Prepare puppet
             curl -O https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
@@ -98,7 +107,10 @@ resources:
             apt-get -y install puppet
 
             # configure puppet.conf file
-            echo 'server = puppetmaster' >> /etc/puppet/puppet.conf
+            echo '[agent]' >> /etc/puppet/puppet.conf
+            echo 'server = puppetmaster.openstacklocal' >> /etc/puppet/puppet.conf
+            puppet agent --enable
+            puppet agent --verbose --no-daemonize --onetime
 
 
             # restarting puppet and turning on ssh service after configuration is done
@@ -122,7 +134,7 @@ outputs:
         template: >
           http://host/
         params:
-          host: { get_attr: [presentation_instance, addresses, 1, addr] }
+          host: { get_attr: [presentation_instance, first_address] }
   instance_name:
     description: Name of the instance
     value: { get_attr: [presentation_instance, name] }
