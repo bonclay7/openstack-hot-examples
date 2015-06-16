@@ -65,6 +65,8 @@ resources:
             ## Changing root password (not really useful, but just to show it's possible)
             echo ec2-user:'$USER_PASSWORD' | /usr/sbin/chpasswd    
             echo 'LC_ALL=en_US.UTF-8' >> /etc/environment
+            apt-get -y update
+            apt-get -y install apache2
             apt-get moo
             
             # cpu overload
