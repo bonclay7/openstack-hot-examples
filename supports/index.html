@@ -344,12 +344,272 @@
 </ul>
 
 <p> </p>
-</div></div></section><section class="has-dark-background" data-background-color="#222222"><div class="sl-block" data-block-type="text" style="width: 863px; left: 49px; top: 22px; height: auto;" data-block-id="a69f54a80f1f5ff5f2fb167c8fcc871c"><div class="sl-block-content" data-placeholder-tag="h1" data-placeholder-text="Title Text" style="color: rgb(255, 255, 255); z-index: 11;" dir="ui">
-<h1>Exemple</h1>
+</div></div></section><section class="has-dark-background" data-background-color="#222222"><div class="sl-block" data-block-type="text" style="width: 863px; left: 49px; top: 10px; height: auto;" data-block-id="a69f54a80f1f5ff5f2fb167c8fcc871c"><div class="sl-block-content" data-placeholder-tag="h1" data-placeholder-text="Title Text" style="color: rgb(255, 255, 255); z-index: 11;" dir="ui">
+<h1>Creation d'un serveur</h1>
 </div></div>
 <div class="sl-block" data-block-type="image" style="width: 70px; height: 70px; left: 0px; top: 616px;" data-block-id="54697adeebbdfb0e86475816245a69c8"><div class="sl-block-content" style="z-index: 12;"><img style="" data-natural-width="144" data-natural-height="144" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491909/orange-w8.png"></div></div>
-<div class="sl-block" data-block-type="image" style="width: 81.7066666666667px; height: 64px; left: 871px; top: 616px;" data-block-id="c02b7f371f58d1373587ec611f7e0064"><div class="sl-block-content" style="z-index: 13;"><img data-natural-width="1149" data-natural-height="900" style="" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491911/Ecole_Centrale_Paris_Logo.svg.png"></div></div></section></section>
-						<section data-background-image="https://s3.amazonaws.com/media-p.slid.es/imports/343355/RyvRIhms/RyvRIhms_011.jpg" data-background-size="contain" data-id="a428ec7f80bf4ef2057bb6eee50e65c7"></section><section data-background-image="https://s3.amazonaws.com/media-p.slid.es/imports/343355/RyvRIhms/RyvRIhms_012.jpg" data-background-size="contain" data-id="d65a9cb5a91b3bca285080aa24549364"></section><section data-background-image="https://s3.amazonaws.com/media-p.slid.es/imports/343355/RyvRIhms/RyvRIhms_013.jpg" data-background-size="contain" data-id="4b35343b16f1f60c5a6bb3028cddda1a"></section><section data-background-image="https://s3.amazonaws.com/media-p.slid.es/imports/343355/RyvRIhms/RyvRIhms_014.jpg" data-background-size="contain" data-id="bcea3e4092c6680f628087da57516332"></section><section data-background-image="https://s3.amazonaws.com/media-p.slid.es/imports/343355/RyvRIhms/RyvRIhms_015.jpg" data-background-size="contain" data-id="99c07c4915bd23d3c151159af4553164"></section><section data-background-image="https://s3.amazonaws.com/media-p.slid.es/imports/343355/RyvRIhms/RyvRIhms_016.jpg" data-background-size="contain" data-id="9b65292b733d61f00d058335566da00d"></section>
+<div class="sl-block" data-block-type="image" style="width: 81.7066666666667px; height: 64px; left: 871px; top: 616px;" data-block-id="c02b7f371f58d1373587ec611f7e0064"><div class="sl-block-content" style="z-index: 13;"><img data-natural-width="1149" data-natural-height="900" style="" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491911/Ecole_Centrale_Paris_Logo.svg.png"></div></div>
+<div class="sl-block" data-block-type="text" data-block-id="d6a1b8115e6ed4d302d502dbdf3b328d" style="height: auto; min-width: 30px; min-height: 30px; width: 600px; left: 70px; top: 101px;"><div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 14; color: rgb(255, 255, 255); text-align: left;">
+<p>Paramètres</p>
+</div></div>
+<div class="sl-block" data-block-type="code" data-block-id="6a435a6675dba6be8531c791b7493e5a" style="min-width: 30px; min-height: 30px; width: 791px; height: 540px; left: 70px; top: 140px;"><div class="sl-block-content" style="z-index: 15; font-size: 73%;"><pre><code>heat_template_version: 2013-05-23
+
+description: This template deploy an instance to provide a html presentation
+
+parameters:
+  image:
+    type: string
+    label: Image name or ID
+    description: Image to be used for compute instance
+    default: ubuntu-trusty-amd64
+  flavor:
+    type: string
+    label: Flavor
+    description: Type of instance (flavor) to be used
+    default: m1.small
+  key_name:
+    type: string
+    label: Key name
+    description: Name of key-pair to be used for compute instance
+    default: heat-instances-key
+  private_network:
+    type: string
+    label: Private network name or ID
+    description: Network to attach instance to.
+    default: demo-net
+  floating_ip_id:
+    type: string
+    label: Floating IP ID
+    description: Floating ip adress. $ neutron floatingip-list
+    default: 571688e3-62c9-4dd6-95f0-d091fac74992
+  ec2-user_password:
+    type: string
+    label: Modified root password
+    default: popito225
+    hidden: true
+  instance_name:
+    type: string
+    label: Instance name
+    default: presinstance</code></pre></div></div></section><section class="has-dark-background" data-background-color="#222222"><div class="sl-block" data-block-type="text" style="width: 863px; left: 49px; top: 22px; height: auto;" data-block-id="115512c5a82935d88c17df30653f34f9"><div class="sl-block-content" data-placeholder-tag="h1" data-placeholder-text="Title Text" style="color: rgb(255, 255, 255); z-index: 10;" dir="ui">
+<h1>Creation d'un serveur</h1>
+</div></div>
+<div class="sl-block" data-block-type="image" style="width: 70px; height: 70px; left: 0px; top: 616px;" data-block-id="3dd3f20608c6825b467b64d2e288ce12"><div class="sl-block-content" style="z-index: 11;"><img style="" data-natural-width="144" data-natural-height="144" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491909/orange-w8.png"></div></div>
+<div class="sl-block" data-block-type="image" style="width: 81.7066666666667px; height: 64px; left: 871px; top: 616px;" data-block-id="1dc3e83cf34d30062ffd38d9e890ab46"><div class="sl-block-content" style="z-index: 12;"><img data-natural-width="1149" data-natural-height="900" style="" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491911/Ecole_Centrale_Paris_Logo.svg.png"></div></div>
+<div class="sl-block" data-block-type="text" style="height: auto; width: 600px; left: 70px; top: 119px;" data-block-id="8d463862d85e77cd30df7daae2995fb5"><div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 13; color: rgb(255, 255, 255); text-align: left;">
+<p>Ressources</p>
+</div></div>
+<div class="sl-block" data-block-type="code" style="width: 429px; height: 444px; left: 70px; top: 172px;" data-block-id="7056e5089917181e06caecb8681280e4"><div class="sl-block-content" style="z-index: 14; font-size: 90%;"><pre><code>resources:  
+  
+  root_password:
+    type: OS::Heat::RandomString
+    properties:
+      length: 10
+
+  pres_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 192.168.17.1/24
+          port_range_min: 8140
+          port_range_max: 8140
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 80
+          port_range_max: 80
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 22
+          port_range_max: 22
+
+
+  private_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: private_network }
+      security_groups:
+        - default        
+        - { get_resource: pres_secgroup }
+
+  presentation_instance:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: image }
+      admin_pass: { get_resource: root_password }
+      flavor: { get_param: flavor }
+      name: { get_param: instance_name }
+      key_name: { get_param: key_name }
+      networks:
+        - port: { get_resource: private_port }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -v
+
+            ## prevent ssh connection
+            service ssh stop
+
+            ## hostname in /etc/hosts
+            ## we use bash to avoid heat circular dependencies if we tried to get the ip address with get_attr instead
+            ## we would have done this into the current template : { get_attr: [presentation_instance, first_address] }
+            echo "$(ifconfig eth0|awk -F':' '/inet addr/ {print $2}'|awk '{print $1}') $INSTANCE_NAME" &gt;&gt; /etc/hosts
+            echo '192.168.17.56 puppetmaster.openstacklocal' &gt;&gt; /etc/hosts
+
+            ## Prepare puppet
+            curl -O https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
+            dpkg -i puppetlabs-release-trusty.deb
+            export LC_ALL=en_US.UTF-8
+
+            ## Refresh apt cache
+            apt-get -y update
+
+            #Install packages
+            apt-get -y install puppet
+
+            # configure puppet.conf file
+            echo '[agent]' &gt;&gt; /etc/puppet/puppet.conf
+            echo 'server = puppetmaster.openstacklocal' &gt;&gt; /etc/puppet/puppet.conf
+            puppet agent --enable
+            puppet agent --verbose --no-daemonize --onetime
+
+
+            # restarting puppet and turning on ssh service after configuration is done
+            puppet agent --verbose 
+            service ssh start            
+          params:
+            "$USER_PASSWORD": { get_resource: root_password }
+            "$INSTANCE_NAME": { get_param: instance_name }
+  
+  association:
+     type: OS::Neutron::FloatingIPAssociation
+     properties:
+       floatingip_id: { get_param: floating_ip_id }
+       port_id: {get_attr: [presentation_instance, addresses, {get_param: private_network}, 0, port]}</code></pre></div></div>
+<div class="sl-block" data-block-type="code" style="width: 429px; height: 444px; left: 509px; top: 172px;" data-block-id="778fdf78ddb4dacecb50eaf9f8e86436"><div class="sl-block-content" style="z-index: 16; font-size: 90%;"><pre><code>resources:  
+  
+  private_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: private_network }
+      security_groups:
+        - default        
+        - { get_resource: pres_secgroup }
+
+  presentation_instance:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: image }
+      admin_pass: { get_resource: root_password }
+      flavor: { get_param: flavor }
+      name: { get_param: instance_name }
+      key_name: { get_param: key_name }
+      networks:
+        - port: { get_resource: private_port }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/bash -v
+
+            ## prevent ssh connection
+            service ssh stop
+
+            ## hostname in /etc/hosts
+            ## we use bash to avoid heat circular dependencies if we tried to get the ip address with get_attr instead
+            ## we would have done this into the current template : { get_attr: [presentation_instance, first_address] }
+            echo "$(ifconfig eth0|awk -F':' '/inet addr/ {print $2}'|awk '{print $1}') $INSTANCE_NAME" &gt;&gt; /etc/hosts
+            echo '192.168.17.56 puppetmaster.openstacklocal' &gt;&gt; /etc/hosts
+
+            ## Prepare puppet
+            curl -O https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
+            dpkg -i puppetlabs-release-trusty.deb
+            export LC_ALL=en_US.UTF-8
+
+            ## Refresh apt cache
+            apt-get -y update
+
+            #Install packages
+            apt-get -y install puppet
+
+            # configure puppet.conf file
+            echo '[agent]' &gt;&gt; /etc/puppet/puppet.conf
+            echo 'server = puppetmaster.openstacklocal' &gt;&gt; /etc/puppet/puppet.conf
+            puppet agent --enable
+            puppet agent --verbose --no-daemonize --onetime
+
+
+            # restarting puppet and turning on ssh service after configuration is done
+            puppet agent --verbose 
+            service ssh start            
+          params:
+            "$USER_PASSWORD": { get_resource: root_password }
+            "$INSTANCE_NAME": { get_param: instance_name }
+  
+  association:
+     type: OS::Neutron::FloatingIPAssociation
+     properties:
+       floatingip_id: { get_param: floating_ip_id }
+       port_id: {get_attr: [presentation_instance, addresses, {get_param: private_network}, 0, port]}</code></pre></div></div></section><section class="has-dark-background" data-background-color="#222222"><div class="sl-block" data-block-type="text" style="width: 863px; left: 49px; top: 22px; height: auto;" data-block-id="dd383ff0c3bd2d07ad486bdf9409d7b8"><div class="sl-block-content" data-placeholder-tag="h1" data-placeholder-text="Title Text" style="color: rgb(255, 255, 255); z-index: 10;" dir="ui">
+<h1>Creation d'un serveur</h1>
+</div></div>
+<div class="sl-block" data-block-type="image" style="width: 70px; height: 70px; left: 0px; top: 616px;" data-block-id="2e21f08192ee3badfe94781231ea12c0"><div class="sl-block-content" style="z-index: 11;"><img style="" data-natural-width="144" data-natural-height="144" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491909/orange-w8.png"></div></div>
+<div class="sl-block" data-block-type="image" style="width: 81.7066666666667px; height: 64px; left: 871px; top: 616px;" data-block-id="53f8c820d6a817e1ebe3a7c1909b167e"><div class="sl-block-content" style="z-index: 12;"><img data-natural-width="1149" data-natural-height="900" style="" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491911/Ecole_Centrale_Paris_Logo.svg.png"></div></div>
+<div class="sl-block" data-block-type="text" style="height: auto; width: 600px; left: 70px; top: 119px;" data-block-id="28d84d9f248d12b31770750abf16ad70"><div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 13; color: rgb(255, 255, 255); text-align: left;">
+<p>Sortie</p>
+</div></div>
+<div class="sl-block" data-block-type="code" style="width: 921px; height: 444px; left: 17px; top: 172px;" data-block-id="9e931cad79ec02a35473b518be04f500"><div class="sl-block-content" style="z-index: 16; font-size: 90%;"><pre><code>resources:  
+  association:
+     type: OS::Neutron::FloatingIPAssociation
+     properties:
+       floatingip_id: { get_param: floating_ip_id }
+       port_id: {get_attr: [presentation_instance, addresses, {get_param: private_network}, 0, port]}
+
+outputs:
+  presentation_url:
+    description: URL de la presentation déployée sur apache
+    value:
+      str_replace:
+        template: &gt;
+          http://host/
+        params:
+          host: { get_attr: [presentation_instance, first_address] }
+  instance_name:
+    description: Name of the instance
+    value: { get_attr: [presentation_instance, name] }
+  instance_ips:
+    description: IP addresses of the instance
+    value: { get_attr: [presentation_instance, addresses] }
+  root_password:
+    description: Autogenerated value (in theory) of the root password
+    value: { get_resource: root_password }</code></pre></div></div></section><section class="has-dark-background" data-background-color="#222222"><div class="sl-block" data-block-type="text" style="width: 863px; left: 49px; top: 22px; height: auto;" data-block-id="162ef5762d05d5d863a54777b9590012"><div class="sl-block-content" data-placeholder-tag="h1" data-placeholder-text="Title Text" style="color: rgb(255, 255, 255); z-index: 11;" dir="ui">
+<h1>Creation d'un serveur</h1>
+</div></div>
+<div class="sl-block" data-block-type="image" style="width: 70px; height: 70px; left: 0px; top: 616px;" data-block-id="8816aa3d536551b385a78512bf9a6caf"><div class="sl-block-content" style="z-index: 12;"><img style="" data-natural-width="144" data-natural-height="144" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491909/orange-w8.png"></div></div>
+<div class="sl-block" data-block-type="image" style="width: 81.7066666666667px; height: 64px; left: 871px; top: 616px;" data-block-id="7e2282063952799d7176950d5205a63a"><div class="sl-block-content" style="z-index: 13;"><img data-natural-width="1149" data-natural-height="900" style="" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491911/Ecole_Centrale_Paris_Logo.svg.png"></div></div>
+<div class="sl-block" data-block-type="text" style="height: auto; width: 600px; left: 70px; top: 119px;" data-block-id="f3f98ca91245c531ead0b1cb499be35c"><div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 14; color: rgb(255, 255, 255); text-align: left;">
+<p>Résultats</p>
+</div></div>
+<div class="sl-block" data-block-type="image" data-block-id="663fa086ea5d9d543791b9e9cd48aa72" style="min-width: 30px; min-height: 30px; width: 930.82489146165px; height: 402px; left: 15px; top: 186px;"><div class="sl-block-content" style="z-index: 15;"><img data-natural-width="1600" data-natural-height="691" style="" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1494767/Screen_Shot_2015-06-16_at_09.20.45.png"></div></div></section><section class="has-dark-background" data-background-color="#222222"><div class="sl-block" data-block-type="text" style="width: 863px; left: 49px; top: 22px; height: auto;" data-block-id="a3b28c50f89a9b6ddec0b45d3c196837"><div class="sl-block-content" data-placeholder-tag="h1" data-placeholder-text="Title Text" style="color: rgb(255, 255, 255); z-index: 11;" dir="ui">
+<h1>Creation d'un serveur</h1>
+</div></div>
+<div class="sl-block" data-block-type="image" style="width: 70px; height: 70px; left: 0px; top: 616px;" data-block-id="b2c2fd072979a1d2e546ad2b30ad5ee6"><div class="sl-block-content" style="z-index: 12;"><img style="" data-natural-width="144" data-natural-height="144" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491909/orange-w8.png"></div></div>
+<div class="sl-block" data-block-type="image" style="width: 81.7066666666667px; height: 64px; left: 871px; top: 616px;" data-block-id="7ae5fa27448463a6252a89846d33a12e"><div class="sl-block-content" style="z-index: 13;"><img data-natural-width="1149" data-natural-height="900" style="" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491911/Ecole_Centrale_Paris_Logo.svg.png"></div></div>
+<div class="sl-block" data-block-type="text" style="height: auto; width: 600px; left: 70px; top: 119px;" data-block-id="7d8ee550bb2e3276bdbdaaed66e555b1"><div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 14; color: rgb(255, 255, 255); text-align: left;">
+<p>Résultats</p>
+</div></div>
+<div class="sl-block" data-block-type="image" data-block-id="e4ea443efdd23edb372354dd32c1a35e" style="min-width: 30px; min-height: 30px; width: 387px; height: 545.070422535211px; left: 312px; top: 141px;"><div class="sl-block-content" style="z-index: 15;"><img data-natural-width="639" data-natural-height="900" style="" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1494769/Screen_Shot_2015-06-16_at_09.22.10.png"></div></div></section><section class="has-dark-background" data-background-color="#222222"><div class="sl-block" data-block-type="text" style="width: 863px; left: 49px; top: 22px; height: auto;" data-block-id="7a43dd80bce63433bd5d92e30b4e9dde"><div class="sl-block-content" data-placeholder-tag="h1" data-placeholder-text="Title Text" style="color: rgb(255, 255, 255); z-index: 11;" dir="ui">
+<h1>Creation d'un serveur</h1>
+</div></div>
+<div class="sl-block" data-block-type="image" style="width: 70px; height: 70px; left: 0px; top: 616px;" data-block-id="816e26e08775e6b86e8dbfa0897ee0eb"><div class="sl-block-content" style="z-index: 12;"><img style="" data-natural-width="144" data-natural-height="144" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491909/orange-w8.png"></div></div>
+<div class="sl-block" data-block-type="image" style="width: 81.7066666666667px; height: 64px; left: 871px; top: 616px;" data-block-id="f6a9b6def0e88b41d7a8a7967fd8e1a7"><div class="sl-block-content" style="z-index: 13;"><img data-natural-width="1149" data-natural-height="900" style="" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491911/Ecole_Centrale_Paris_Logo.svg.png"></div></div>
+<div class="sl-block" data-block-type="text" style="height: auto; width: 600px; left: 70px; top: 119px;" data-block-id="5694f424b47c7300f95deb039c1b1990"><div class="sl-block-content" data-placeholder-tag="p" data-placeholder-text="Text" style="z-index: 14; color: rgb(255, 255, 255); text-align: left;">
+<p>Résultats</p>
+</div></div>
+<div class="sl-block" data-block-type="image" style="width: 576.45px; height: 567px; left: 272px; top: 125px;" data-block-id="92efda9d88fc56257012c6c9087b8941"><div class="sl-block-content" style="z-index: 16;"><img style="" data-natural-width="915" data-natural-height="900" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1494771/Screen_Shot_2015-06-16_at_09.34.44.png"></div></div></section></section><section class="has-dark-background" data-background-color="#222222"><div class="sl-block" data-block-type="text" style="width: 863px; left: 49px; top: 43px; height: auto;" data-block-id="eadf508d2fac8cc7b75c42d955e7d6e9"><div class="sl-block-content" data-placeholder-tag="h1" data-placeholder-text="Title Text" style="color: rgb(255, 255, 255); z-index: 11;" dir="ui">
+<h1>Démo !</h1>
+</div></div>
+<div class="sl-block" data-block-type="image" style="width: 70px; height: 70px; left: 0px; top: 616px;" data-block-id="797d304aa25734ddcff791cff3aeb7ab"><div class="sl-block-content" style="z-index: 12;"><img style="" data-natural-width="144" data-natural-height="144" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491909/orange-w8.png"></div></div>
+<div class="sl-block" data-block-type="image" style="width: 81.7066666666667px; height: 64px; left: 871px; top: 616px;" data-block-id="945d65043124fc5fa9582cad45602a00"><div class="sl-block-content" style="z-index: 13;"><img data-natural-width="1149" data-natural-height="900" style="" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1491911/Ecole_Centrale_Paris_Logo.svg.png"></div></div>
+<div class="sl-block" data-block-type="image" style="width: 576.597222222222px; height: 361px; left: 192px; top: 188px;" data-block-id="c6738fa76a39d13082381ddf17c4a4ba"><div class="sl-block-content" style="z-index: 14;"><img data-natural-width="460" data-natural-height="288" style="" data-src="https://s3.amazonaws.com/media-p.slid.es/uploads/343355/images/1494102/basketballElephant_1564125c.jpg"></div></div></section>
 			</div>
 		</div>
 
