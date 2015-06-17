@@ -1,6 +1,6 @@
 heat_template_version: 2013-05-23
 
-description: Two servers with server 2 pinging server one during it's first boot
+description: Two servers with server2 pinging server1 during it's first boot
 
 parameters:
   image:
@@ -17,7 +17,7 @@ parameters:
     type: string
     label: Key name
     description: Name of key-pair to be used for compute instance
-    default: demo-key
+    default: heat-instances-key
   private_network:
     type: string
     label: Private network name or ID
@@ -29,52 +29,28 @@ resources:
     type: OS::Nova::Server
     properties:
       name: server1
-      flavor: { get_param: InstanceType }
-      key_name: { get_param: KeyName }
-      image: { get_param: ImageID }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key }
+      image: { get_param: image }
       networks:
-        - network: { get_param: NetID }
-      user_data: 
-        str_replace:
-          template: |
-            #!/bin/bash
-            curl -X PUT -H 'Content-Type:application/json' \
-              -d '{"status" : "SUCCESS","Reason" : "Server1 started","ip" : "%ip_address%"}' \
-              "$wait_handle$"
-          params:
-            "%ip_address%":
-              get_attr: [server1, first_address]
-            "%wait_handle%":
-              get_resource: server1_wait_handle
-      user_data_format: RAW
-
-  server1_wait: 
-    type: OS::Heat::WaitCondition   
-    properties: 
-      handle: 
-        get_resource: server1_wait_handle
-      timeout: 2000
-
-  server1_wait_handle: 
-    type: OS::Heat::WaitConditionHandle
+        - network: { get_param: private_network }     
 
   server2:
     type: OS::Nova::Server
     properties:
       name: server2
-      flavor: { get_param: InstanceType }
-      key_name: { get_param: KeyName }
-      image: { get_param: ImageID }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key }
+      image: { get_param: image }
       networks:
-        - network: { get_param: NetID }
+        - network: { get_param: private_network }
       user_data:
         str_replace:
           template: |
-            #!/bin/bash
-            ping -c 10 %ip_address%
+            #!/bin/bash -v
+            ping -c 10 ip_address
           params:
-            "%ip_address%":
-              get_attr: [server1, first_address]
+            "ip_address": { get_attr: [server1, first_address] }
       user_data_format: RAW
 
 outputs:

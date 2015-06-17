@@ -24,12 +24,19 @@ parameters:
   ec2-user_password:
     type: string    
     hidden: true
+  puppetmaster_server_ip:
+    type: string
+    label: Puppetmaster IP address for wiki instances configuration
+  puppetmaster_server_name:
+    type: string
+    label:  puppetmaster server hostname for wiki instances configuration
 
 resources:
   instance_name:
     type: OS::Heat::RandomString
     properties:
       length: 10
+
   private_port:
     type: OS::Neutron::Port
     properties:
@@ -43,54 +50,55 @@ resources:
     properties:
       admin_pass: popito225
       image: { get_param: image }
-      flavor: { get_param: flavor }      
-      key_name: { get_param: key_name }
+      flavor: { get_param: flavor }    
       name:
         str_replace:
           template: |
             wiki-pool-suffix
           params: 
-            suffix: { get_resource: instance_name}
+            suffix: { get_resource: instance_name}  
+      key_name: { get_param: key_name }
+      networks:
+        - port: { get_resource : private_port }
       metadata: {get_param: metadata}
       user_data:
         str_replace:
           template: |
             #!/bin/bash -v
+            service ssh stop
 
             ## hostname in /etc/hosts
             ## we use bash to avoid heat circular dependencies if we tried to get the ip address with get_attr instead
             ## we would have done this into the current template : { get_attr: [puppetmaster_instance, first_address] }                
             echo "$(ifconfig eth0|awk -F':' '/inet addr/ {print $2}'|awk '{print $1}') wiki-pool-$INSTANCE_NAME" >> /etc/hosts
+            echo '$PUPPETMASTER_IP $PUPPETMASTER_HOSTNAME' >> /etc/hosts
 
             ## Changing root password (not really useful, but just to show it's possible)
             echo ec2-user:'$USER_PASSWORD' | /usr/sbin/chpasswd    
             echo 'LC_ALL=en_US.UTF-8' >> /etc/environment
-            apt-get -y update
-            apt-get -y install apache2
-            apt-get moo
-            
-            # cpu overload
-            # dd if=/dev/zero of=/dev/null &
 
             #Prepare puppet
-            #curl -O https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
-            #dpkg -i puppetlabs-release-trusty.deb
+            curl -O https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
+            dpkg -i puppetlabs-release-trusty.deb
 
-            ## Refresh apt cache
-            #apt-get -y update
-            #apt-get -y install puppet git
+            # Refresh apt cache
+            apt-get -y update
+            apt-get -y install puppet git
 
-            #echo 'server = puppetmaster' >> /etc/puppet/puppet.conf
-            #puppet agent --enable
-            #puppet agent --verbose --no-daemonize --onetime
+            # configure Puppet as an agent
+            echo '[agent]' >> /etc/puppet/puppet.conf
+            echo 'server = $PUPPETMASTER_HOSTNAME' >> /etc/puppet/puppet.conf
+            puppet agent --enable
+            puppet agent --verbose --no-daemonize --onetime
 
-            ## TODO : connect to puppetmaster to retrieve wiki running configuration
+            apt-get moo
+            service ssh start
           params:
             "$USER_PASSWORD": { get_param: ec2-user_password }
             "$INSTANCE_NAME": { get_resource: instance_name }
-      networks:
-        - port: { get_resource : private_port }      
-
+            "$PUPPETMASTER_IP": { get_param: puppetmaster_server_ip }
+            "$PUPPETMASTER_HOSTNAME": { get_param: puppetmaster_server_name }
+            
   member:
     type: OS::Neutron::PoolMember
     properties:

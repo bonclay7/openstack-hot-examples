@@ -31,6 +31,14 @@ parameters:
     label: Modified root password
     default: popito225
     hidden: true
+  puppetmaster_server_ip:
+    type: string
+    label: Puppetmaster IP address for wiki instances configuration
+    default: 192.168.17.56
+  puppetmaster_server_name:
+    type: string
+    label:  Puppetmaster server hostname for wiki instances configuration
+    default: puppetmaster.openstacklocal
 
 resources:  
   wiki_secgroup:
@@ -57,6 +65,8 @@ resources:
           ec2-user_password: {get_param: ec2-user_password}    
           wiki_secgroup: { get_resource: wiki_secgroup }
           metadata: {"metering.stack": {get_param: "OS::stack_id"}}
+          puppetmaster_server_ip: { get_param: puppetmaster_server_ip }
+          puppetmaster_server_name: { get_param: puppetmaster_server_name }
   wiki_scaleup_policy:
     type: OS::Heat::ScalingPolicy
     properties:
