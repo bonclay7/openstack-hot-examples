@@ -59,7 +59,7 @@ resources:
       flavor: { get_param: flavor }
       admin_pass: { get_param: admin_pass }
       networks:
-       - private_network
+       - network: { get_param: private_network }
       user_data:
         str_replace:
           template: |
