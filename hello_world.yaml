@@ -47,9 +47,9 @@ parameters:
         description: Port number must be between 40000 and 60000
   private_network:
     type: string
-    label: Private network name or ID
+    label: Private network ID
     description: Network to attach instance to.
-    default: private
+    default: 71783ef1-1168-42c2-8dc0-0f23fb1222c6
 resources:
   server:
     type: OS::Nova::Server
