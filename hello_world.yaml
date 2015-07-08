@@ -49,7 +49,7 @@ parameters:
     type: string
     label: Private network ID
     description: Network to attach instance to.
-    default: 71783ef1-1168-42c2-8dc0-0f23fb1222c6
+    default: 56d2f32b-68e5-42db-a23c-b33a22510bae
 resources:
   server:
     type: OS::Nova::Server
