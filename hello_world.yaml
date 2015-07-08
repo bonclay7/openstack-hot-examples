@@ -12,6 +12,7 @@ parameters:
   key_name:
     type: string
     description: Name of an existing key pair to use for the server
+    default: heat-instances-key
     constraints:
       - custom_constraint: nova.keypair
   flavor:
@@ -23,6 +24,7 @@ parameters:
   image:
     type: string
     description: Image ID or image name to use for the server
+    default: Cirros
     constraints:
       - custom_constraint: glance.image
   admin_pass:
@@ -43,7 +45,11 @@ parameters:
     constraints:
       - range: { min: 40000, max: 60000 }
         description: Port number must be between 40000 and 60000
-
+  private_network:
+    type: string
+    label: Private network name or ID
+    description: Network to attach instance to.
+    default: private
 resources:
   server:
     type: OS::Nova::Server
